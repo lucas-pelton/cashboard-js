@@ -10,6 +10,9 @@ const projects = await cb.projects.list({ page: 1 });
 await cb.timeEntries.create({ /* fields per API docs */ });
 ```
 
+For local testing, copy [`.env.example`](.env.example) to `.env` and set
+`CASHBOARD_SUBDOMAIN` and `CASHBOARD_API_KEY`. Keep `.env` private.
+
 Resources documented by the API (each has `list`, `get`, `create`, `update`, `delete` where supported): `account`, `clientContacts`, `clientCompanies`, `comments`, `documentTemplates`, `employees`, `estimates`, `expenses`, `invoiceLineItems`, `invoicePayments`, `invoices`, `lineItems`, `payments`, `projectAssignments`, `projects`, `projectLists`, and `timeEntries`. `clients` and `people` remain aliases for `clientCompanies` and `clientContacts`.
 For anything else use `cb.request(method, path, { query, body })`. Failures throw `CashboardError` (`status`, `body`).
 Auth is HTTP Basic with the account subdomain as the username and API key as the password; override the endpoint with `baseUrl` if needed.
