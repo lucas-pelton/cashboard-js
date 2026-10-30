@@ -1,17 +1,17 @@
 /** Any JSON record returned by the API. */
-export type Record = { id?: number; [field: string]: any };
+export type ApiRecord = { id?: number; [field: string]: any };
 export type Query = { [param: string]: string | number | boolean | undefined | null };
 
 /** CRUD accessor shared by every resource. */
 export interface Resource {
   /** GET /{path}. Optional query params (page, filters). */
-  list(query?: Query): Promise<Record[]>;
+  list(query?: Query): Promise<ApiRecord[]>;
   /** GET /{path}/{id}. */
-  get(id: number | string): Promise<Record>;
+  get(id: number | string): Promise<ApiRecord>;
   /** POST /{path}. Body shape is wrapped by singular resource name, e.g. { time_entry: {...} }. */
-  create(data: object): Promise<Record>;
+  create(data: object): Promise<ApiRecord>;
   /** PUT /{path}/{id}. */
-  update(id: number | string, data: object): Promise<Record>;
+  update(id: number | string, data: object): Promise<ApiRecord>;
   /** DELETE /{path}/{id}. */
   delete(id: number | string): Promise<any>;
 }
