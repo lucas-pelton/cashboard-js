@@ -13,3 +13,6 @@ await cb.timeEntries.create({ /* fields per API docs */ });
 Resources (each has `list`, `get`, `create`, `update`, `delete`): `clients`, `people`, `projects`, `jobs`, `tasks`, `timeEntries`, `expenses`, `invoices`, `estimates`, `payments`, `services`, `products`, `taxes`.
 For anything else use `cb.request(method, path, { query, body })`. Failures throw `CashboardError` (`status`, `body`).
 Auth is HTTP Basic with the API key; override the endpoint with `baseUrl` if needed.
+
+## For coding agents
+See [AGENTS.md](AGENTS.md), per-resource docs in [docs/](docs/), TypeScript types in `src/index.d.ts`, and `cb.describe()` at runtime.

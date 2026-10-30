@@ -4,7 +4,9 @@
   "description": "Client library for the Cashboard API (Node.js / Bun)",
   "type": "module",
   "main": "src/index.js",
-  "exports": "./src/index.js",
+  "types": "src/index.d.ts",
+  "exports": { ".": { "types": "./src/index.d.ts", "default": "./src/index.js" } },
+  "files": ["src", "AGENTS.md", "docs"],
   "engines": { "node": ">=18" },
   "scripts": { "test": "node --test" },
   "license": "MIT"

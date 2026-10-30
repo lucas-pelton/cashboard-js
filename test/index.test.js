@@ -32,3 +32,13 @@ test('errors throw CashboardError', async () => {
   const c = new Cashboard({ subdomain: 'a', apiKey: 'k', fetch: m.fetch });
   await assert.rejects(c.clients.get(1), (e) => e instanceof CashboardError && e.status === 404);
 });
+
+test('describe lists resources and every resource has docs', async () => {
+  const { existsSync } = await import('node:fs');
+  const c = new Cashboard({ subdomain: 'a', apiKey: 'k' });
+  const d = c.describe();
+  for (const name of Object.keys(d.resources)) {
+    assert.ok(c[name], name);
+    assert.ok(existsSync(new URL(`../docs/${name}.md`, import.meta.url)), name);
+  }
+});
