@@ -15,8 +15,8 @@ test('lists with auth and query', async () => {
   const m = mock(200, [{ id: 1 }]);
   const c = new Cashboard({ subdomain: 'acme', apiKey: 'k', fetch: m.fetch });
   assert.deepEqual(await c.projects.list({ page: 2 }), [{ id: 1 }]);
-  assert.equal(m.calls[0].url, 'https://acme.cashboardapp.com/api/v1/projects?page=2');
-  assert.equal(m.calls[0].init.headers.Authorization, 'Basic ' + Buffer.from('k:X').toString('base64'));
+  assert.equal(m.calls[0].url, 'https://api.cashboardapp.com/projects?page=2');
+  assert.equal(m.calls[0].init.headers.Authorization, 'Basic ' + Buffer.from('acme:k').toString('base64'));
 });
 
 test('create sends JSON body', async () => {

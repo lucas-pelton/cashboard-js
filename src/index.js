@@ -1,4 +1,4 @@
-import { RESOURCES, METHODS } from './resources.js';
+import { RESOURCES, METHODS, ALIASES } from './resources.js';
 
 export class CashboardError extends Error {
   constructor(message, status, body) {
@@ -11,20 +11,30 @@ export class CashboardError extends Error {
 
 /** CRUD accessor for one API resource (e.g. `cb.projects`). See src/resources.js. */
 class Resource {
-  constructor(client, path) {
+  constructor(client, definition) {
     this.client = client;
-    this.path = path;
+    this.path = definition.path;
+    this.createPath = definition.createPath || definition.path;
+    for (const [name, [method, path]] of Object.entries(definition.actions || {})) {
+      this[name] = (id, body) => this.action(id, path, { method, ...(body === undefined ? {} : { body }) });
+    }
   }
   /** GET /{path}. Resolves to an array of records. @param {object} [query] URL query params. */
   list(query) { return this.client.request('GET', `/${this.path}`, { query }); }
   /** GET /{path}/{id}. Resolves to one record. */
-  get(id) { return this.client.request('GET', `/${this.path}/${encodeURIComponent(id)}`); }
+  get(id) {
+    return this.client.request('GET', id === undefined ? `/${this.path}` : `/${this.path}/${encodeURIComponent(id)}`);
+  }
   /** POST /{path} with JSON body `data`. */
-  create(data) { return this.client.request('POST', `/${this.path}`, { body: data }); }
+  create(data) { return this.client.request('POST', `/${this.createPath}`, { body: data }); }
   /** PUT /{path}/{id} with JSON body `data`. */
   update(id, data) { return this.client.request('PUT', `/${this.path}/${encodeURIComponent(id)}`, { body: data }); }
   /** DELETE /{path}/{id}. */
   delete(id) { return this.client.request('DELETE', `/${this.path}/${encodeURIComponent(id)}`); }
+  action(id, action, options) {
+    const suffix = id === undefined ? `/${action}` : `/${encodeURIComponent(id)}/${action}`;
+    return this.client.request(options?.method || 'GET', `/${this.path}${suffix}`, options);
+  }
 }
 
 /** Cashboard API client. Construct with { subdomain, apiKey }; see README.md and AGENTS.md. */
@@ -35,12 +45,14 @@ export class Cashboard {
   constructor({ subdomain, apiKey, baseUrl, fetch: fetchImpl } = {}) {
     if (!apiKey) throw new TypeError('apiKey is required');
     if (!baseUrl && !subdomain) throw new TypeError('subdomain or baseUrl is required');
-    this.baseUrl = (baseUrl || `https://${subdomain}.cashboardapp.com/api/v1`).replace(/\/+$/, '');
-    this.auth = 'Basic ' + Buffer.from(`${apiKey}:X`).toString('base64');
+    this.baseUrl = (baseUrl || 'https://api.cashboardapp.com').replace(/\/+$/, '');
+    if (!subdomain) throw new TypeError('subdomain is required');
+    this.auth = 'Basic ' + Buffer.from(`${subdomain}:${apiKey}`).toString('base64');
     this.fetch = fetchImpl || globalThis.fetch;
-    for (const [name, { path }] of Object.entries(RESOURCES)) {
-      this[name] = new Resource(this, path);
+    for (const [name, definition] of Object.entries(RESOURCES)) {
+      this[name] = new Resource(this, definition);
     }
+    for (const [alias, name] of Object.entries(ALIASES)) this[alias] = this[name];
   }
 
   /** Machine-readable summary of every resource and method, for agents/tools. */
@@ -59,8 +71,11 @@ export class Cashboard {
     for (const [k, v] of Object.entries(query || {})) {
       if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
     }
-    const headers = { Authorization: this.auth, Accept: 'application/json' };
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    const headers = {
+      Authorization: this.auth,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
     const res = await this.fetch(url, {
       method,
       headers,

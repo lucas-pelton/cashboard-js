@@ -1,8 +1,6 @@
-# cb.payments
+# `cb.payments`
 
-Payments received against invoices.
-
-API endpoint: `/payments`
+Payments at `/payments`. Supports CRUD and `invoices(id)`.
 
 | Method | HTTP | Notes |
 |---|---|---|

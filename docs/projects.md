@@ -1,8 +1,6 @@
-# cb.projects
+# `cb.projects`
 
-Projects grouping jobs, usually belonging to a client.
-
-API endpoint: `/projects`
+Projects at `/projects`. Supports CRUD plus `toggleStatus(id)`, `lists(id)`, `lineItems(id)`, `assignedEmployees(id)`, and `assignedEmployeesAll(id, body)`.
 
 | Method | HTTP | Notes |
 |---|---|---|

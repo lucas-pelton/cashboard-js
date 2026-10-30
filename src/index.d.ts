@@ -6,22 +6,24 @@ export type Query = { [param: string]: string | number | boolean | undefined | n
 export interface Resource {
   /** GET /{path}. Optional query params (page, filters). */
   list(query?: Query): Promise<ApiRecord[]>;
-  /** GET /{path}/{id}. */
-  get(id: number | string): Promise<ApiRecord>;
+  /** GET /{path}/{id}; omit id for singleton resources such as account. */
+  get(id?: number | string): Promise<ApiRecord>;
   /** POST /{path}. Body shape is wrapped by singular resource name, e.g. { time_entry: {...} }. */
   create(data: object): Promise<ApiRecord>;
   /** PUT /{path}/{id}. */
   update(id: number | string, data: object): Promise<ApiRecord>;
   /** DELETE /{path}/{id}. */
   delete(id: number | string): Promise<any>;
+  /** Call a documented resource action, such as projects.toggleStatus(id, body). */
+  action(id: number | string, action: string, options?: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; query?: Query; body?: any }): Promise<any>;
 }
 
 export interface CashboardOptions {
-  /** Account subdomain: https://<subdomain>.cashboardapp.com */
-  subdomain?: string;
+  /** Cashboard account subdomain, used as the HTTP Basic Auth username. */
+  subdomain: string;
   /** API key (sent as HTTP Basic username, password "X"). Required. */
   apiKey: string;
-  /** Override the full base URL (default https://<subdomain>.cashboardapp.com/api/v1). */
+  /** Override the API base URL (default https://api.cashboardapp.com). */
   baseUrl?: string;
   /** Custom fetch implementation (testing, proxies). Defaults to global fetch. */
   fetch?: typeof fetch;
@@ -36,32 +38,27 @@ export class CashboardError extends Error {
 
 export class Cashboard {
   constructor(options: CashboardOptions);
-  /** Client companies you bill. Referenced by projects, jobs and invoices. Endpoint: /companies */
-  clients: Resource;
-  /** People: team members and client contacts. Endpoint: /people */
-  people: Resource;
-  /** Projects grouping jobs, usually belonging to a client. Endpoint: /projects */
-  projects: Resource;
-  /** Billable jobs within a project. Endpoint: /jobs */
-  jobs: Resource;
-  /** Tasks / to-dos within jobs. Endpoint: /tasks */
-  tasks: Resource;
-  /** Logged time against a job or task. Endpoint: /time_entries */
-  timeEntries: Resource;
-  /** Expenses logged against projects/jobs. Endpoint: /expenses */
-  expenses: Resource;
-  /** Invoices sent to clients. Endpoint: /invoices */
-  invoices: Resource;
-  /** Estimates / quotes sent to clients. Endpoint: /estimates */
+  account: Resource;
+  clientContacts: Resource;
+  clientCompanies: Resource;
+  comments: Resource;
+  documentTemplates: Resource;
+  employees: Resource;
   estimates: Resource;
-  /** Payments received against invoices. Endpoint: /payments */
+  expenses: Resource;
+  invoiceLineItems: Resource;
+  invoicePayments: Resource;
+  invoices: Resource;
+  lineItems: Resource;
   payments: Resource;
-  /** Service catalog items used on time entries and invoices. Endpoint: /services */
-  services: Resource;
-  /** Product catalog items. Endpoint: /products */
-  products: Resource;
-  /** Tax rates applied to invoices. Endpoint: /taxes */
-  taxes: Resource;
+  projectAssignments: Resource;
+  projects: Resource;
+  projectLists: Resource;
+  timeEntries: Resource;
+  /** Alias for clientCompanies. */
+  clients: Resource;
+  /** Alias for clientContacts. */
+  people: Resource;
   /** Raw request for endpoints without an accessor. Path is relative to baseUrl, e.g. '/projects/1'. */
   request(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, opts?: { query?: Query; body?: any }): Promise<any>;
   /** Machine-readable summary of all resources and methods. */

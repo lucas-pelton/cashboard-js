@@ -1,8 +1,6 @@
-# cb.timeEntries
+# `cb.timeEntries`
 
-Logged time against a job or task.
-
-API endpoint: `/time_entries`
+Time entries at `/time_entries`. Supports CRUD and `toggleTimer(id)`.
 
 | Method | HTTP | Notes |
 |---|---|---|

@@ -1,8 +1,6 @@
-# cb.expenses
+# `cb.expenses`
 
-Expenses logged against projects/jobs.
-
-API endpoint: `/expenses`
+Expenses at `/expenses`. Supports list, create, get, update, and delete.
 
 | Method | HTTP | Notes |
 |---|---|---|

@@ -1,8 +1,6 @@
-# cb.estimates
+# `cb.estimates`
 
-Estimates / quotes sent to clients.
-
-API endpoint: `/estimates`
+Estimates at `/estimates`. Supports CRUD plus `toggleStatus(id)`, `lineItems(id)`, `lineItemTasks(id)`, `lineItemProducts(id)`, and `lineItemCustoms(id)`.
 
 | Method | HTTP | Notes |
 |---|---|---|

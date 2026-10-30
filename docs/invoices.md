@@ -1,8 +1,6 @@
-# cb.invoices
+# `cb.invoices`
 
-Invoices sent to clients.
-
-API endpoint: `/invoices`
+Invoices at `/invoices`. Supports CRUD plus `importUninvoicedItems(id, body)` and `lineItems(id)`.
 
 | Method | HTTP | Notes |
 |---|---|---|
