@@ -6,11 +6,13 @@ export type Query = { [param: string]: string | number | boolean | undefined | n
 export interface Resource {
   /** GET /{path}. Optional query params (page, filters). */
   list(query?: Query): Promise<ApiRecord[]>;
+  /** GET /{path}/new. Fetch the API-provided template for creating a record. */
+  new(): Promise<ApiRecord>;
   /** GET /{path}/{id}; omit id for singleton resources such as account. */
   get(id?: number | string): Promise<ApiRecord>;
-  /** POST /{path}. Body shape is wrapped by singular resource name, e.g. { time_entry: {...} }. */
+  /** POST /{path}. Data is wrapped by the singular resource name unless already wrapped. */
   create(data: object): Promise<ApiRecord>;
-  /** PUT /{path}/{id}. */
+  /** PUT /{path}/{id}. Data is wrapped by the singular resource name unless already wrapped. */
   update(id: number | string, data: object): Promise<ApiRecord>;
   /** DELETE /{path}/{id}. */
   delete(id: number | string): Promise<any>;

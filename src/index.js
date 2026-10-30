@@ -15,25 +15,32 @@ class Resource {
     this.client = client;
     this.path = definition.path;
     this.createPath = definition.createPath || definition.path;
+    this.singular = definition.singular;
     for (const [name, [method, path]] of Object.entries(definition.actions || {})) {
       this[name] = (id, body) => this.action(id, path, { method, ...(body === undefined ? {} : { body }) });
     }
   }
   /** GET /{path}. Resolves to an array of records. @param {object} [query] URL query params. */
   list(query) { return this.client.request('GET', `/${this.path}`, { query }); }
+  /** GET /{path}/new. Returns the API's create template. */
+  new() { return this.client.request('GET', `/${this.path}/new`); }
   /** GET /{path}/{id}. Resolves to one record. */
   get(id) {
     return this.client.request('GET', id === undefined ? `/${this.path}` : `/${this.path}/${encodeURIComponent(id)}`);
   }
   /** POST /{path} with JSON body `data`. */
-  create(data) { return this.client.request('POST', `/${this.createPath}`, { body: data }); }
+  create(data) { return this.client.request('POST', `/${this.createPath}`, { body: this.wrap(data) }); }
   /** PUT /{path}/{id} with JSON body `data`. */
-  update(id, data) { return this.client.request('PUT', `/${this.path}/${encodeURIComponent(id)}`, { body: data }); }
+  update(id, data) { return this.client.request('PUT', `/${this.path}/${encodeURIComponent(id)}`, { body: this.wrap(data) }); }
   /** DELETE /{path}/{id}. */
   delete(id) { return this.client.request('DELETE', `/${this.path}/${encodeURIComponent(id)}`); }
   action(id, action, options) {
     const suffix = id === undefined ? `/${action}` : `/${encodeURIComponent(id)}/${action}`;
     return this.client.request(options?.method || 'GET', `/${this.path}${suffix}`, options);
+  }
+  wrap(data) {
+    if (!this.singular || data === null || typeof data !== 'object' || Array.isArray(data)) return data;
+    return Object.prototype.hasOwnProperty.call(data, this.singular) ? data : { [this.singular]: data };
   }
 }
 

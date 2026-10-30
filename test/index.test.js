@@ -19,12 +19,27 @@ test('lists with auth and query', async () => {
   assert.equal(m.calls[0].init.headers.Authorization, 'Basic ' + Buffer.from('acme:k').toString('base64'));
 });
 
-test('create sends JSON body', async () => {
+test('create wraps an unwrapped JSON body', async () => {
   const m = mock(201, { id: 5 });
   const c = new Cashboard({ subdomain: 'a', apiKey: 'k', fetch: m.fetch });
   await c.timeEntries.create({ hours: 1 });
   assert.equal(m.calls[0].init.method, 'POST');
-  assert.equal(m.calls[0].init.body, '{"hours":1}');
+  assert.equal(m.calls[0].init.body, '{"time_entry":{"hours":1}}');
+});
+
+test('create preserves an already wrapped JSON body', async () => {
+  const m = mock(201, { id: 5 });
+  const c = new Cashboard({ subdomain: 'a', apiKey: 'k', fetch: m.fetch });
+  await c.timeEntries.create({ time_entry: { minutes: 15 } });
+  assert.equal(m.calls[0].init.body, '{"time_entry":{"minutes":15}}');
+});
+
+test('new fetches the API create template', async () => {
+  const m = mock(200, { minutes: 0 });
+  const c = new Cashboard({ subdomain: 'a', apiKey: 'k', fetch: m.fetch });
+  assert.deepEqual(await c.timeEntries.new(), { minutes: 0 });
+  assert.equal(m.calls[0].url, 'https://api.cashboardapp.com/time_entries/new');
+  assert.equal(m.calls[0].init.method, 'GET');
 });
 
 test('errors throw CashboardError', async () => {

@@ -1,8 +1,6 @@
-# cb.clients
+# `cb.clients`
 
-Client companies you bill. Referenced by projects, jobs and invoices.
-
-API endpoint: `/companies`
+Alias for [`cb.clientCompanies`](./clientCompanies.md), backed by `/client_companies`.
 
 | Method | HTTP | Notes |
 |---|---|---|

@@ -1,8 +1,6 @@
-# cb.people
+# `cb.people`
 
-People: team members and client contacts.
-
-API endpoint: `/people`
+Alias for [`cb.clientContacts`](./clientContacts.md), backed by `/client_contacts`.
 
 | Method | HTTP | Notes |
 |---|---|---|
